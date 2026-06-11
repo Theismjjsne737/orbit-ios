@@ -1,25 +1,42 @@
 {
   "expo": {
-    "name": "orbit-native",
-    "slug": "orbit-native",
+    "name": "Orbit",
+    "slug": "orbit",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "scheme": "orbit",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#040407",
+    "splash": {
+      "backgroundColor": "#040407"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "io.orbitapp.orbit",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Used to authenticate with Face ID",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#040407"
       },
-      "predictiveBackGestureEnabled": false
+      "package": "io.orbitapp.orbit"
     },
     "web": {
+      "bundler": "metro",
+      "output": "static",
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }
