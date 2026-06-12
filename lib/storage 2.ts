@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
 import { OrbitData, OrbitUser, UserSubscription, Goal } from './types';
 
 const KEY = 'orbit-data';
+const USER_KEY = 'orbit-user';
 
 const defaultData: OrbitData = {
   goal: null,
@@ -67,14 +67,12 @@ export async function markToolUsed(toolId: string): Promise<void> {
 }
 
 export async function resetData(): Promise<void> {
-  await AsyncStorage.removeItem(KEY);
-  await SecureStore.deleteItemAsync('orbit-user');
+  await AsyncStorage.multiRemove([KEY, USER_KEY]);
 }
 
-// User stored in SecureStore (iOS Keychain / Android Keystore) — not AsyncStorage
 export async function saveUser(user: OrbitUser): Promise<void> {
   try {
-    await SecureStore.setItemAsync('orbit-user', JSON.stringify(user));
+    await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
     const data = await loadData();
     await saveData({ ...data, user });
   } catch (err) {
@@ -85,7 +83,7 @@ export async function saveUser(user: OrbitUser): Promise<void> {
 
 export async function loadUser(): Promise<OrbitUser | null> {
   try {
-    const raw = await SecureStore.getItemAsync('orbit-user');
+    const raw = await AsyncStorage.getItem(USER_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as OrbitUser;
   } catch (err) {
@@ -95,10 +93,7 @@ export async function loadUser(): Promise<OrbitUser | null> {
 }
 
 export async function signOut(): Promise<void> {
-  await SecureStore.deleteItemAsync('orbit-user');
-  // Also clear user from orbit-data to prevent ghost auth state
-  const data = await loadData();
-  await saveData({ ...data, user: null });
+  await AsyncStorage.removeItem(USER_KEY);
 }
 
 export async function upgradeToPro(email: string): Promise<void> {

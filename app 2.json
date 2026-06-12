@@ -15,6 +15,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "io.orbitapp.orbit",
       "infoPlist": {
+        "NSFaceIDUsageDescription": "Used to authenticate with Face ID",
         "ITSAppUsesNonExemptEncryption": false
       }
     },

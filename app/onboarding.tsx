@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import { OrbitWordmark } from '../components/OrbitLogo';
@@ -14,6 +15,8 @@ import { setGoal, setSubscriptions, completeOnboarding, saveUser } from '../lib/
 import { Goal, UserSubscription, FREE_LIMIT } from '../lib/types';
 
 type Step = 'goal' | 'tools' | 'profile' | 'pricing';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const STEPS: Step[] = ['goal', 'tools', 'profile', 'pricing'];
 
@@ -41,13 +44,19 @@ export default function Onboarding() {
     setLoading(true);
     try {
       const now = new Date().toISOString();
+      const trimmedEmail = email.trim();
+      if (trimmedEmail && !EMAIL_RE.test(trimmedEmail)) {
+        Alert.alert('Invalid email', 'Enter a valid email or leave it blank.');
+        setLoading(false);
+        return;
+      }
       const subs: UserSubscription[] = Array.from(selectedTools).map(toolId => {
         const tool = AI_TOOLS.find(t => t.id === toolId)!;
         return { toolId, monthlyPrice: tool.defaultPrice, addedAt: now, lastUsed: null, renewsOn: null };
       });
       await setGoal(selectedGoal);
       await setSubscriptions(subs);
-      await saveUser({ email: email.trim() || 'guest@orbit.app', plan: 'free', signedInAt: now });
+      await saveUser({ email: trimmedEmail, plan: 'free', signedInAt: now });
       await completeOnboarding();
       router.replace('/dashboard');
     } finally {
@@ -179,6 +188,7 @@ export default function Onboarding() {
             placeholderTextColor="rgba(255,255,255,0.25)"
             autoCapitalize="none"
             keyboardType="email-address"
+            maxLength={254}
             className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-base"
           />
           <Text className="text-white/30 text-xs mt-3">Optional — skip to continue as guest.</Text>
